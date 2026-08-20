@@ -1,101 +1,144 @@
+'use client'
+
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+
+import type { ProjectListCounts, ProjectTab } from '@/lib/queries/projects'
+
 type Option = { id: string; label: string }
+
+const TABS: { value: ProjectTab; label: string; countKey: keyof ProjectListCounts }[] = [
+  { value: 'all', label: 'Tutti', countKey: 'all' },
+  { value: 'active', label: 'Attivi', countKey: 'active' },
+  { value: 'overdue', label: 'In ritardo', countKey: 'overdue' },
+  { value: 'mine', label: 'Miei', countKey: 'mine' },
+  { value: 'archived', label: 'Archiviati', countKey: 'archived' },
+]
+
+const STATUSES = [
+  { value: 'Draft', label: 'Bozza' },
+  { value: 'Active', label: 'Attivo' },
+  { value: 'OnHold', label: 'In pausa' },
+  { value: 'Completed', label: 'Completato' },
+  { value: 'Cancelled', label: 'Annullato' },
+]
 
 export function ProjectFilterBar({
   owners,
   units,
   tags,
   current,
+  tab,
+  counts,
 }: {
   owners: Option[]
   units: Option[]
   tags: Option[]
   current: Record<string, string | undefined>
+  tab: ProjectTab
+  counts: ProjectListCounts
 }) {
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  function setParam(key: string, value: string | null) {
+    const params = new URLSearchParams(searchParams.toString())
+    if (value) params.set(key, value)
+    else params.delete(key)
+    router.push(`${pathname}?${params.toString()}`)
+  }
+
   return (
-    <form method="get" className="mb-4 flex flex-wrap items-end gap-3 rounded-lg border border-slate-200 bg-white p-4 text-sm">
-      <div className="flex flex-col gap-1">
-        <label className="text-xs font-medium text-slate-600">Stato</label>
-        <select name="status" defaultValue={current.status ?? ''} className="rounded border border-slate-300 px-2 py-1">
-          <option value="">Tutti</option>
-          {['Draft', 'Active', 'OnHold', 'Completed', 'Cancelled'].map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
-        </select>
+    <div className="flex flex-col gap-3">
+      <div className="flex items-center gap-1 border-b border-pt-line">
+        {TABS.map((t) => {
+          const active = tab === t.value
+          return (
+            <button
+              key={t.value}
+              type="button"
+              onClick={() => setParam('tab', t.value === 'all' ? null : t.value)}
+              className={`mr-3.5 pb-2.5 pt-1.5 text-[13.5px] ${
+                active ? 'font-medium text-pt-accent shadow-[inset_0_-2px_0_theme(colors.pt.accent)]' : 'text-pt-muted hover:text-pt-ink'
+              }`}
+            >
+              {t.label} <span className={active ? 'text-pt-accentText' : 'text-pt-ghost'}>{counts[t.countKey]}</span>
+            </button>
+          )
+        })}
       </div>
-      <div className="flex flex-col gap-1">
-        <label className="text-xs font-medium text-slate-600">Priorità</label>
-        <select name="priority" defaultValue={current.priority ?? ''} className="rounded border border-slate-300 px-2 py-1">
-          <option value="">Tutte</option>
-          {['High', 'Medium', 'Low'].map((p) => (
-            <option key={p} value={p}>
-              {p}
-            </option>
-          ))}
-        </select>
+
+      <div className="flex flex-wrap items-center gap-2">
+        <FilterSelect label="Stato" value={current.status} onChange={(v) => setParam('status', v)} options={STATUSES.map((s) => ({ id: s.value, label: s.label }))} allLabel="tutti" />
+        <FilterSelect label="Priorità" value={current.priority} onChange={(v) => setParam('priority', v)} options={[{ id: 'High', label: 'Alta' }, { id: 'Medium', label: 'Media' }, { id: 'Low', label: 'Bassa' }]} allLabel="tutte" />
+        <FilterSelect label="Owner" value={current.owner} onChange={(v) => setParam('owner', v)} options={owners} allLabel="tutti" />
+        <FilterSelect label="Unità" value={current.unit} onChange={(v) => setParam('unit', v)} options={units} allLabel="tutte" />
+        <FilterSelect label="Tag" value={current.tag} onChange={(v) => setParam('tag', v)} options={tags} allLabel="tutti" />
+
+        <label className="flex items-center gap-1.5 text-[12.5px] text-pt-muted">
+          <input
+            type="checkbox"
+            checked={current.archived === '1'}
+            onChange={(e) => setParam('archived', e.target.checked ? '1' : null)}
+          />
+          Includi archiviati
+        </label>
+
+        <div className="ml-auto flex items-center gap-3">
+          <select
+            value={current.sort ?? ''}
+            onChange={(e) => setParam('sort', e.target.value || null)}
+            className="border-none bg-transparent text-[12.5px] text-pt-faint focus:outline-none"
+          >
+            <option value="">Ordina per: più recenti</option>
+            <option value="dueDate">Ordina per: scadenza</option>
+            <option value="priority">Ordina per: priorità</option>
+            <option value="name">Ordina per: nome</option>
+          </select>
+          <a
+            href={`/projects/export?${new URLSearchParams(
+              Object.fromEntries(Object.entries(current).filter((e): e is [string, string] => !!e[1])),
+            ).toString()}`}
+            className="rounded-md border border-pt-lineStrong bg-pt-surface px-3 py-[7px] text-[13px] text-pt-soft hover:bg-pt-shell"
+          >
+            Esporta CSV
+          </a>
+        </div>
       </div>
-      <div className="flex flex-col gap-1">
-        <label className="text-xs font-medium text-slate-600">Owner</label>
-        <select name="owner" defaultValue={current.owner ?? ''} className="rounded border border-slate-300 px-2 py-1">
-          <option value="">Tutti</option>
-          {owners.map((o) => (
-            <option key={o.id} value={o.id}>
-              {o.label}
-            </option>
-          ))}
-        </select>
-      </div>
-      <div className="flex flex-col gap-1">
-        <label className="text-xs font-medium text-slate-600">Unità richiedente</label>
-        <select name="unit" defaultValue={current.unit ?? ''} className="rounded border border-slate-300 px-2 py-1">
-          <option value="">Tutte</option>
-          {units.map((u) => (
-            <option key={u.id} value={u.id}>
-              {u.label}
-            </option>
-          ))}
-        </select>
-      </div>
-      <div className="flex flex-col gap-1">
-        <label className="text-xs font-medium text-slate-600">Tag</label>
-        <select name="tag" defaultValue={current.tag ?? ''} className="rounded border border-slate-300 px-2 py-1">
-          <option value="">Tutti</option>
-          {tags.map((t) => (
-            <option key={t.id} value={t.id}>
-              {t.label}
-            </option>
-          ))}
-        </select>
-      </div>
-      <div className="flex flex-col gap-1">
-        <label className="text-xs font-medium text-slate-600">Ordina per</label>
-        <select name="sort" defaultValue={current.sort ?? ''} className="rounded border border-slate-300 px-2 py-1">
-          <option value="">Più recenti</option>
-          <option value="dueDate">Scadenza</option>
-          <option value="priority">Priorità</option>
-          <option value="name">Nome</option>
-        </select>
-      </div>
-      <label className="flex items-center gap-1.5 pb-1.5">
-        <input type="checkbox" name="overdue" value="1" defaultChecked={current.overdue === '1'} />
-        Solo in ritardo
-      </label>
-      <label className="flex items-center gap-1.5 pb-1.5">
-        <input type="checkbox" name="archived" value="1" defaultChecked={current.archived === '1'} />
-        Includi archiviati
-      </label>
-      <button type="submit" className="rounded-md bg-slate-800 px-3 py-1.5 text-white hover:bg-slate-700">
-        Filtra
-      </button>
-      <a
-        href={`/projects/export?${new URLSearchParams(
-          Object.fromEntries(Object.entries(current).filter((e): e is [string, string] => !!e[1])),
-        ).toString()}`}
-        className="rounded-md border border-slate-300 px-3 py-1.5 text-slate-700 hover:bg-slate-50"
-      >
-        Esporta CSV
-      </a>
-    </form>
+    </div>
+  )
+}
+
+function FilterSelect({
+  label,
+  value,
+  onChange,
+  options,
+  allLabel,
+}: {
+  label: string
+  value: string | undefined
+  onChange: (value: string | null) => void
+  options: Option[]
+  allLabel: string
+}) {
+  const active = Boolean(value)
+  return (
+    <select
+      value={value ?? ''}
+      onChange={(e) => onChange(e.target.value || null)}
+      className={`rounded-full border px-2.5 py-[5px] text-[12.5px] ${
+        active ? 'border-pt-accentBorder bg-pt-accentSoft text-pt-accent' : 'border-pt-lineStrong bg-pt-surface text-pt-soft'
+      }`}
+    >
+      <option value="">
+        {label}: {allLabel}
+      </option>
+      {options.map((o) => (
+        <option key={o.id} value={o.id}>
+          {o.label}
+        </option>
+      ))}
+    </select>
   )
 }

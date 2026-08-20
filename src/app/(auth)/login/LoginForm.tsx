@@ -11,7 +11,7 @@ export function LoginForm({ redirectTo }: { redirectTo: string }) {
     <form action={formAction} className="flex flex-col gap-4">
       <input type="hidden" name="redirectTo" value={redirectTo} />
       <div className="flex flex-col gap-1">
-        <label htmlFor="email" className="text-sm font-medium text-slate-700">
+        <label htmlFor="email" className="text-sm font-medium text-pt-soft">
           Email
         </label>
         <input
@@ -20,11 +20,11 @@ export function LoginForm({ redirectTo }: { redirectTo: string }) {
           type="email"
           required
           autoFocus
-          className="rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+          className="rounded-md border border-pt-lineStrong px-3 py-2 text-sm focus:border-pt-accent focus:outline-none focus:ring-1 focus:ring-pt-accent"
         />
       </div>
       <div className="flex flex-col gap-1">
-        <label htmlFor="password" className="text-sm font-medium text-slate-700">
+        <label htmlFor="password" className="text-sm font-medium text-pt-soft">
           Password
         </label>
         <input
@@ -32,14 +32,14 @@ export function LoginForm({ redirectTo }: { redirectTo: string }) {
           name="password"
           type="password"
           required
-          className="rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+          className="rounded-md border border-pt-lineStrong px-3 py-2 text-sm focus:border-pt-accent focus:outline-none focus:ring-1 focus:ring-pt-accent"
         />
       </div>
-      {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
+      {state?.error && <p className="text-sm text-pt-danger">{state.error}</p>}
       <button
         type="submit"
         disabled={pending}
-        className="mt-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-60"
+        className="mt-2 rounded-md bg-pt-accent px-4 py-2 text-sm font-medium text-white hover:bg-pt-accentDark disabled:opacity-60"
       >
         {pending ? 'Accesso in corso…' : 'Accedi'}
       </button>

@@ -11,24 +11,24 @@ export function TaskCreateForm({ projectId, assigneeOptions }: { projectId: stri
   const [state, formAction, pending] = useActionState<FormState, FormData>(action, undefined)
 
   return (
-    <details className="mb-4 rounded-lg border border-slate-200 bg-white">
-      <summary className="cursor-pointer select-none px-4 py-2 text-sm font-medium text-slate-700">+ Nuovo task</summary>
-      <form action={formAction} className="flex flex-wrap items-end gap-3 border-t border-slate-100 p-4">
+    <details className="mb-4 rounded-lg border border-pt-line bg-pt-surface">
+      <summary className="cursor-pointer select-none px-4 py-2 text-sm font-medium text-pt-soft">+ Nuovo task</summary>
+      <form action={formAction} className="flex flex-wrap items-end gap-3 border-t border-pt-line p-4">
         <div className="flex flex-col gap-1">
-          <label className="text-xs font-medium text-slate-600">Titolo</label>
-          <input name="title" required className="rounded border border-slate-300 px-2 py-1 text-sm" />
+          <label className="text-xs font-medium text-pt-muted">Titolo</label>
+          <input name="title" required className="rounded border border-pt-lineStrong px-2 py-1 text-sm" />
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-xs font-medium text-slate-600">Priorità</label>
-          <select name="priority" defaultValue="Medium" className="rounded border border-slate-300 px-2 py-1 text-sm">
+          <label className="text-xs font-medium text-pt-muted">Priorità</label>
+          <select name="priority" defaultValue="Medium" className="rounded border border-pt-lineStrong px-2 py-1 text-sm">
             <option value="High">Alta</option>
             <option value="Medium">Media</option>
             <option value="Low">Bassa</option>
           </select>
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-xs font-medium text-slate-600">Assegnatario</label>
-          <select name="assigneeId" defaultValue="" className="rounded border border-slate-300 px-2 py-1 text-sm">
+          <label className="text-xs font-medium text-pt-muted">Assegnatario</label>
+          <select name="assigneeId" defaultValue="" className="rounded border border-pt-lineStrong px-2 py-1 text-sm">
             <option value="">Non assegnato</option>
             {assigneeOptions.map((o) => (
               <option key={o.id} value={o.id}>
@@ -38,22 +38,22 @@ export function TaskCreateForm({ projectId, assigneeOptions }: { projectId: stri
           </select>
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-xs font-medium text-slate-600">Scadenza</label>
-          <input name="dueDate" type="date" className="rounded border border-slate-300 px-2 py-1 text-sm" />
+          <label className="text-xs font-medium text-pt-muted">Scadenza</label>
+          <input name="dueDate" type="date" className="rounded border border-pt-lineStrong px-2 py-1 text-sm" />
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-xs font-medium text-slate-600">Ore stimate</label>
-          <input name="estimatedHours" type="number" min={0} step="0.5" className="w-20 rounded border border-slate-300 px-2 py-1 text-sm" />
+          <label className="text-xs font-medium text-pt-muted">Ore stimate</label>
+          <input name="estimatedHours" type="number" min={0} step="0.5" className="w-20 rounded border border-pt-lineStrong px-2 py-1 text-sm" />
         </div>
         <div className="flex w-full flex-col gap-1">
-          <label className="text-xs font-medium text-slate-600">Descrizione</label>
-          <textarea name="description" rows={2} className="rounded border border-slate-300 px-2 py-1 text-sm" />
+          <label className="text-xs font-medium text-pt-muted">Descrizione</label>
+          <textarea name="description" rows={2} className="rounded border border-pt-lineStrong px-2 py-1 text-sm" />
         </div>
-        {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
+        {state?.error && <p className="text-sm text-pt-danger">{state.error}</p>}
         <button
           type="submit"
           disabled={pending}
-          className="rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-60"
+          className="rounded-md bg-pt-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-pt-accentDark disabled:opacity-60"
         >
           {pending ? 'Creazione…' : 'Crea task'}
         </button>

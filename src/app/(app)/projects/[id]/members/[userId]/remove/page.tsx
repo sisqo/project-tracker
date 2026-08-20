@@ -26,19 +26,19 @@ export default async function RemoveMemberPage({
 
   return (
     <div className="max-w-2xl">
-      <h2 className="mb-2 text-base font-semibold text-slate-900">
+      <h2 className="mb-2 text-base font-semibold text-pt-ink">
         Rimuovi {member.firstName} {member.lastName} da {project.name}
       </h2>
-      <p className="mb-4 text-sm text-slate-600">
+      <p className="mb-4 text-sm text-pt-muted">
         Ha {openTasks.length} task aperti in questo progetto. Scegli a chi riassegnarli (o lascia
         vuoto per azzerare l&apos;assegnatario) prima di procedere.
       </p>
       <form action={action} className="space-y-4">
-        <div className="rounded-lg border border-slate-200 bg-white">
+        <div className="rounded-lg border border-pt-line bg-pt-surface">
           {openTasks.map((task) => (
-            <div key={task.id} className="flex items-center justify-between gap-4 border-b border-slate-100 p-4 last:border-0">
-              <p className="text-sm font-medium text-slate-900">{task.title}</p>
-              <select name={`assignee-${task.id}`} className="rounded border border-slate-300 px-2 py-1 text-sm">
+            <div key={task.id} className="flex items-center justify-between gap-4 border-b border-pt-line p-4 last:border-0">
+              <p className="text-sm font-medium text-pt-ink">{task.title}</p>
+              <select name={`assignee-${task.id}`} className="rounded border border-pt-lineStrong px-2 py-1 text-sm">
                 <option value="">— nessuno —</option>
                 {options.map((opt) => (
                   <option key={opt.id} value={opt.id}>
@@ -49,7 +49,7 @@ export default async function RemoveMemberPage({
             </div>
           ))}
         </div>
-        <button type="submit" className="rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-500">
+        <button type="submit" className="rounded-md bg-pt-overdue px-4 py-2 text-sm font-medium text-white hover:bg-pt-danger">
           Conferma riassegnazioni e rimuovi
         </button>
       </form>

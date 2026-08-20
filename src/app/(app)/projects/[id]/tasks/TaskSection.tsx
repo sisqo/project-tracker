@@ -22,26 +22,25 @@ export function TaskSection({
   assigneeOptions: Option[]
 }) {
   return (
-    <section>
-      <div className="mb-2 flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-slate-900">Task</h2>
-        <div className="flex items-center gap-2 text-xs">
-          <a href={`/projects/${projectId}/tasks/export`} className="rounded px-2 py-1 text-slate-600 hover:bg-slate-100">
-            Esporta CSV
-          </a>
+    <div className="flex flex-col gap-3.5">
+      <div className="flex items-center gap-2.5">
+        <div className="flex rounded-md bg-pt-shell p-0.5">
           <Link
-            href={`/projects/${projectId}?view=board`}
-            className={`rounded px-2 py-1 ${view === 'board' ? 'bg-slate-800 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+            href={`/projects/${projectId}?tab=task&view=board`}
+            className={`rounded px-3 py-[5px] text-[13px] ${view === 'board' ? 'bg-pt-surface font-medium text-pt-ink shadow-sm' : 'text-pt-muted'}`}
           >
             Board
           </Link>
           <Link
-            href={`/projects/${projectId}?view=list`}
-            className={`rounded px-2 py-1 ${view === 'list' ? 'bg-slate-800 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+            href={`/projects/${projectId}?tab=task&view=list`}
+            className={`rounded px-3 py-[5px] text-[13px] ${view === 'list' ? 'bg-pt-surface font-medium text-pt-ink shadow-sm' : 'text-pt-muted'}`}
           >
             Lista
           </Link>
         </div>
+        <a href={`/projects/${projectId}/tasks/export`} className="ml-auto rounded-md border border-pt-lineStrong bg-pt-surface px-3 py-[6px] text-[13px] text-pt-soft hover:bg-pt-shell">
+          Esporta CSV
+        </a>
       </div>
       {canOperate && <TaskCreateForm projectId={projectId} assigneeOptions={assigneeOptions} />}
       {view === 'board' ? (
@@ -49,6 +48,6 @@ export function TaskSection({
       ) : (
         <TaskListView projectId={projectId} tasks={tasks} canOperate={canOperate} />
       )}
-    </section>
+    </div>
   )
 }

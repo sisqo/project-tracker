@@ -58,7 +58,7 @@ export default async function TaskDetailPage({ params }: { params: Promise<{ id:
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <div className="mb-1 flex items-center gap-2 text-xs text-slate-400">
+        <div className="mb-1 flex items-center gap-2 text-xs text-pt-ghost">
           <Link href="/" className="hover:underline">
             Progetti
           </Link>
@@ -68,7 +68,7 @@ export default async function TaskDetailPage({ params }: { params: Promise<{ id:
           </Link>
         </div>
         <div className="flex items-center gap-3">
-          <h1 className="text-xl font-semibold text-slate-900">{task.title}</h1>
+          <h1 className="font-serif text-2xl font-medium text-pt-ink">{task.title}</h1>
           <TaskStatusBadge status={task.status} />
           <PriorityBadge priority={task.priority} />
         </div>
@@ -91,22 +91,25 @@ export default async function TaskDetailPage({ params }: { params: Promise<{ id:
 
       <ChecklistSection projectId={projectId} taskId={taskId} items={items} canEdit={canOperate} />
 
-      <AttachmentSection
-        attachments={taskAttachments.map((a) => ({
-          id: a.id,
-          type: a.type,
-          label: a.label,
-          url: a.url,
-          fileRef: a.fileRef,
-          uploadedAt: a.uploadedAt,
-          uploaderName: `${a.uploaderFirstName} ${a.uploaderLastName}`,
-          canDelete: canDeleteAttachment(user, { uploadedById: a.uploadedById }, project),
-        }))}
-        canUpload={canOperate}
-        uploadFileAction={addTaskFileAttachmentAction.bind(null, projectId, taskId)}
-        uploadLinkAction={addTaskLinkAttachmentAction.bind(null, projectId, taskId)}
-        deleteAction={deleteTaskAttachmentAction.bind(null, projectId, taskId)}
-      />
+      <div>
+        <h2 className="mb-2 text-sm font-semibold text-pt-ink">Allegati</h2>
+        <AttachmentSection
+          attachments={taskAttachments.map((a) => ({
+            id: a.id,
+            type: a.type,
+            label: a.label,
+            url: a.url,
+            fileRef: a.fileRef,
+            uploadedAt: a.uploadedAt,
+            uploaderName: `${a.uploaderFirstName} ${a.uploaderLastName}`,
+            canDelete: canDeleteAttachment(user, { uploadedById: a.uploadedById }, project),
+          }))}
+          canUpload={canOperate}
+          uploadFileAction={addTaskFileAttachmentAction.bind(null, projectId, taskId)}
+          uploadLinkAction={addTaskLinkAttachmentAction.bind(null, projectId, taskId)}
+          deleteAction={deleteTaskAttachmentAction.bind(null, projectId, taskId)}
+        />
+      </div>
     </div>
   )
 }

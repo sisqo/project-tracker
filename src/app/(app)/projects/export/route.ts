@@ -6,10 +6,10 @@ import { formatDate } from '@/lib/format'
 import { getFilteredProjects, parseProjectFilters } from '@/lib/queries/projects'
 
 export async function GET(request: NextRequest) {
-  await requireUser()
+  const user = await requireUser()
 
   const sp = Object.fromEntries(request.nextUrl.searchParams.entries())
-  const filters = parseProjectFilters(sp)
+  const filters = parseProjectFilters(sp, user.id)
   const rows = await getFilteredProjects(filters)
 
   const csv = toCsv(

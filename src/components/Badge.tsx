@@ -1,9 +1,9 @@
 const PROJECT_STATUS_STYLES: Record<string, string> = {
-  Draft: 'bg-slate-100 text-slate-700',
-  Active: 'bg-emerald-100 text-emerald-700',
-  OnHold: 'bg-amber-100 text-amber-700',
-  Completed: 'bg-blue-100 text-blue-700',
-  Cancelled: 'bg-rose-100 text-rose-700',
+  Draft: 'bg-pt-shell text-pt-muted',
+  Active: 'bg-pt-goodSoft text-pt-good',
+  OnHold: 'bg-pt-warnSoft text-pt-warn',
+  Completed: 'bg-pt-infoSoft text-pt-info',
+  Cancelled: 'bg-pt-dangerSoft text-pt-danger',
 }
 
 const PROJECT_STATUS_LABELS: Record<string, string> = {
@@ -15,11 +15,11 @@ const PROJECT_STATUS_LABELS: Record<string, string> = {
 }
 
 const TASK_STATUS_STYLES: Record<string, string> = {
-  Todo: 'bg-slate-100 text-slate-700',
-  InProgress: 'bg-indigo-100 text-indigo-700',
-  Waiting: 'bg-amber-100 text-amber-700',
-  Completed: 'bg-blue-100 text-blue-700',
-  Cancelled: 'bg-rose-100 text-rose-700',
+  Todo: 'bg-pt-shell text-pt-muted',
+  InProgress: 'bg-pt-accentSoft text-pt-accent',
+  Waiting: 'bg-pt-warnSoft text-pt-warn',
+  Completed: 'bg-pt-infoSoft text-pt-info',
+  Cancelled: 'bg-pt-dangerSoft text-pt-danger',
 }
 
 const TASK_STATUS_LABELS: Record<string, string> = {
@@ -31,9 +31,9 @@ const TASK_STATUS_LABELS: Record<string, string> = {
 }
 
 const PRIORITY_STYLES: Record<string, string> = {
-  High: 'bg-rose-100 text-rose-700',
-  Medium: 'bg-amber-100 text-amber-700',
-  Low: 'bg-slate-100 text-slate-600',
+  High: 'bg-pt-dangerSoft text-pt-danger',
+  Medium: 'bg-pt-warnSoft text-pt-warn',
+  Low: 'bg-pt-shell text-pt-muted',
 }
 
 const PRIORITY_LABELS: Record<string, string> = {
@@ -44,7 +44,7 @@ const PRIORITY_LABELS: Record<string, string> = {
 
 function Pill({ className, children }: { className: string; children: React.ReactNode }) {
   return (
-    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${className}`}>
+    <span className={`inline-flex items-center rounded px-2 py-0.5 text-xs font-medium ${className}`}>
       {children}
     </span>
   )
@@ -63,13 +63,13 @@ export function PriorityBadge({ priority }: { priority: string }) {
 }
 
 export function OverdueBadge() {
-  return <Pill className="bg-rose-600 text-white">In ritardo</Pill>
+  return <Pill className="bg-pt-overdue text-white">In ritardo</Pill>
 }
 
 export function ActiveBadge({ isActive }: { isActive: boolean }) {
   return isActive ? (
-    <Pill className="bg-emerald-100 text-emerald-700">Attivo</Pill>
+    <Pill className="bg-pt-goodSoft text-pt-good">Attivo</Pill>
   ) : (
-    <Pill className="bg-slate-200 text-slate-600">Disattivato</Pill>
+    <Pill className="bg-pt-shell text-pt-muted">Disattivato</Pill>
   )
 }

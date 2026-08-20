@@ -23,11 +23,11 @@ export default async function NewProjectPage() {
 
   return (
     <div>
-      <h1 className="mb-4 text-lg font-semibold text-slate-900">Nuovo progetto</h1>
+      <h1 className="mb-4 font-serif text-[26px] font-medium text-pt-ink">Nuovo progetto</h1>
       {rows.length === 0 ? (
-        <p className="text-sm text-slate-600">
+        <p className="text-sm text-pt-muted">
           Nessun richiedente attivo. Crea prima un richiedente dalle{' '}
-          <a href="/admin/requesters" className="text-indigo-600 hover:underline">
+          <a href="/admin/requesters" className="text-pt-accent hover:underline">
             anagrafiche
           </a>
           .

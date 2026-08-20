@@ -37,22 +37,21 @@ export function AttachmentSection({
   const [deletePending, startDelete] = useTransition()
 
   return (
-    <section>
-      <h2 className="mb-2 text-sm font-semibold text-slate-900">Allegati</h2>
-      <ul className="mb-3 space-y-2">
+    <div className="flex flex-col gap-3">
+      <ul className="space-y-2">
         {attachments.map((a) => (
-          <li key={a.id} className="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm">
+          <li key={a.id} className="flex items-center justify-between rounded-lg border border-pt-line bg-pt-surface px-3 py-2 text-sm">
             <div>
               {a.type === 'File' ? (
-                <a href={`/api/attachments/${a.id}`} className="font-medium text-indigo-600 hover:underline">
+                <a href={`/api/attachments/${a.id}`} className="font-medium text-pt-accent hover:underline">
                   {a.label}
                 </a>
               ) : (
-                <a href={a.url ?? '#'} target="_blank" rel="noreferrer" className="font-medium text-indigo-600 hover:underline">
+                <a href={a.url ?? '#'} target="_blank" rel="noreferrer" className="font-medium text-pt-accent hover:underline">
                   {a.label} ↗
                 </a>
               )}
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-pt-ghost">
                 {a.uploaderName} · {formatDateTime(a.uploadedAt)}
               </p>
             </div>
@@ -61,41 +60,41 @@ export function AttachmentSection({
                 type="button"
                 disabled={deletePending}
                 onClick={() => startDelete(() => deleteAction(a.id))}
-                className="text-xs text-rose-600 hover:text-rose-800 disabled:opacity-60"
+                className="text-xs text-pt-danger hover:text-pt-overdue disabled:opacity-60"
               >
                 Elimina
               </button>
             )}
           </li>
         ))}
-        {attachments.length === 0 && <p className="text-sm text-slate-400">Nessun allegato.</p>}
+        {attachments.length === 0 && <p className="text-sm text-pt-ghost">Nessun allegato.</p>}
       </ul>
       {canUpload && (
         <div className="flex flex-wrap gap-4">
           <form action={fileFormAction} className="flex items-end gap-2">
             <div className="flex flex-col gap-1">
-              <label className="text-xs font-medium text-slate-600">File</label>
+              <label className="text-xs font-medium text-pt-muted">File</label>
               <input name="file" type="file" required className="text-xs" />
             </div>
-            <input name="label" placeholder="Etichetta (opzionale)" className="rounded border border-slate-300 px-2 py-1 text-xs" />
-            <button type="submit" disabled={filePending} className="rounded-md bg-slate-800 px-3 py-1.5 text-xs font-medium text-white hover:bg-slate-700 disabled:opacity-60">
+            <input name="label" placeholder="Etichetta (opzionale)" className="rounded border border-pt-lineStrong px-2 py-1 text-xs" />
+            <button type="submit" disabled={filePending} className="rounded-md bg-pt-ink px-3 py-1.5 text-xs font-medium text-white hover:bg-pt-soft disabled:opacity-60">
               Carica
             </button>
-            {fileState?.error && <span className="text-xs text-red-600">{fileState.error}</span>}
+            {fileState?.error && <span className="text-xs text-pt-danger">{fileState.error}</span>}
           </form>
           <form action={linkFormAction} className="flex items-end gap-2">
             <div className="flex flex-col gap-1">
-              <label className="text-xs font-medium text-slate-600">Link</label>
-              <input name="url" type="url" placeholder="https://…" required className="rounded border border-slate-300 px-2 py-1 text-xs" />
+              <label className="text-xs font-medium text-pt-muted">Link</label>
+              <input name="url" type="url" placeholder="https://…" required className="rounded border border-pt-lineStrong px-2 py-1 text-xs" />
             </div>
-            <input name="label" placeholder="Etichetta (opzionale)" className="rounded border border-slate-300 px-2 py-1 text-xs" />
-            <button type="submit" disabled={linkPending} className="rounded-md bg-slate-800 px-3 py-1.5 text-xs font-medium text-white hover:bg-slate-700 disabled:opacity-60">
+            <input name="label" placeholder="Etichetta (opzionale)" className="rounded border border-pt-lineStrong px-2 py-1 text-xs" />
+            <button type="submit" disabled={linkPending} className="rounded-md bg-pt-ink px-3 py-1.5 text-xs font-medium text-white hover:bg-pt-soft disabled:opacity-60">
               Aggiungi
             </button>
-            {linkState?.error && <span className="text-xs text-red-600">{linkState.error}</span>}
+            {linkState?.error && <span className="text-xs text-pt-danger">{linkState.error}</span>}
           </form>
         </div>
       )}
-    </section>
+    </div>
   )
 }

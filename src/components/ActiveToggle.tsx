@@ -18,7 +18,7 @@ export function ActiveToggle({
       type="button"
       disabled={pending}
       onClick={() => startTransition(() => action(id, !isActive))}
-      className={isActive ? 'text-rose-600 hover:text-rose-800 disabled:opacity-60' : 'text-emerald-600 hover:text-emerald-800 disabled:opacity-60'}
+      className={isActive ? 'text-pt-danger hover:text-pt-overdue disabled:opacity-60' : 'text-pt-good hover:text-pt-good disabled:opacity-60'}
     >
       {isActive ? 'Disattiva' : 'Riattiva'}
     </button>

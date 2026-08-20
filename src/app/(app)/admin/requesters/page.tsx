@@ -32,11 +32,12 @@ export default async function RequestersPage() {
     .orderBy(desc(requesters.createdAt))
 
   return (
-    <div>
+    <div className="flex flex-col gap-4">
+      <h1 className="font-serif text-[26px] font-medium text-pt-ink">Richiedenti</h1>
       <CreateRequesterForm units={units} />
-      <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
+      <div className="overflow-x-auto rounded-md border border-pt-line bg-pt-surface">
         <table className="w-full text-left text-sm">
-          <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase text-slate-500">
+          <thead className="border-b border-pt-line bg-pt-surfaceSoft font-mono text-[10.5px] uppercase tracking-[0.1em] text-pt-faint">
             <tr>
               <th className="px-4 py-2">Nome</th>
               <th className="px-4 py-2">Email</th>
@@ -47,12 +48,12 @@ export default async function RequestersPage() {
           </thead>
           <tbody>
             {allRequesters.map((r) => (
-              <tr key={r.id} className="border-b border-slate-100 last:border-0">
+              <tr key={r.id} className="border-b border-pt-line/70 last:border-0">
                 <td className="px-4 py-2">
                   {r.firstName} {r.lastName}
                 </td>
-                <td className="px-4 py-2 text-slate-600">{r.email}</td>
-                <td className="px-4 py-2 text-slate-600">
+                <td className="px-4 py-2 text-pt-muted">{r.email}</td>
+                <td className="px-4 py-2 text-pt-muted">
                   {r.unitCode} — {r.unitName}
                 </td>
                 <td className="px-4 py-2">

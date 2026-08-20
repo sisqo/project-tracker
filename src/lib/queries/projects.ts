@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, isNotNull, lt, sql } from 'drizzle-orm'
+import { and, asc, desc, eq, isNotNull, lt, or, sql } from 'drizzle-orm'
 import { alias } from 'drizzle-orm/pg-core'
 
 import { db } from '@/lib/db/client'
@@ -12,6 +12,11 @@ export type ProjectFilters = {
   tagId?: string
   overdueOnly?: boolean
   includeArchived?: boolean
+  // "Archiviati" tab — only archived projects, distinct from includeArchived
+  // (which means "also show archived among everything else").
+  archivedOnly?: boolean
+  // "Miei" tab — projects where the given user is owner or a member.
+  mineUserId?: string
   sort?: string
 }
 
@@ -25,17 +30,21 @@ export type ProjectListRow = {
   progressPercent: number
   progressUpdatedAt: Date | null
   dueDate: string | null
+  completionDate: string | null
   isArchived: boolean
+  openTaskCount: number
   requesterName: string
   unitName: string
   ownerName: string
 }
 
-export async function getFilteredProjects(filters: ProjectFilters): Promise<ProjectListRow[]> {
-  const owner = alias(users, 'owner_user')
-
+function buildProjectConditions(filters: ProjectFilters) {
   const conditions = []
-  if (!filters.includeArchived) conditions.push(eq(projects.isArchived, false))
+  if (filters.archivedOnly) {
+    conditions.push(eq(projects.isArchived, true))
+  } else if (!filters.includeArchived) {
+    conditions.push(eq(projects.isArchived, false))
+  }
   if (filters.status) conditions.push(eq(projects.status, filters.status as (typeof projects.$inferSelect)['status']))
   if (filters.priority)
     conditions.push(eq(projects.priority, filters.priority as (typeof projects.$inferSelect)['priority']))
@@ -51,6 +60,20 @@ export async function getFilteredProjects(filters: ProjectFilters): Promise<Proj
       sql`${projects.id} in (select ${projectTags.projectId} from ${projectTags} where ${projectTags.tagId} = ${filters.tagId})`,
     )
   }
+  if (filters.mineUserId) {
+    conditions.push(
+      or(
+        eq(projects.ownerId, filters.mineUserId),
+        sql`${projects.id} in (select ${projectMembers.projectId} from ${projectMembers} where ${projectMembers.userId} = ${filters.mineUserId})`,
+      ),
+    )
+  }
+  return conditions
+}
+
+export async function getFilteredProjects(filters: ProjectFilters): Promise<ProjectListRow[]> {
+  const owner = alias(users, 'owner_user')
+  const conditions = buildProjectConditions(filters)
 
   const orderBy = (() => {
     switch (filters.sort) {
@@ -76,7 +99,12 @@ export async function getFilteredProjects(filters: ProjectFilters): Promise<Proj
       progressPercent: projects.progressPercent,
       progressUpdatedAt: projects.progressUpdatedAt,
       dueDate: projects.dueDate,
+      completionDate: projects.completionDate,
       isArchived: projects.isArchived,
+      openTaskCount: sql<number>`(
+        select count(*)::int from tasks
+        where tasks.project_id = ${projects.id} and tasks.status not in ('Completed', 'Cancelled')
+      )`,
       requesterFirstName: requesters.firstName,
       requesterLastName: requesters.lastName,
       unitName: organizationalUnits.name,
@@ -100,22 +128,69 @@ export async function getFilteredProjects(filters: ProjectFilters): Promise<Proj
     progressPercent: r.progressPercent,
     progressUpdatedAt: r.progressUpdatedAt,
     dueDate: r.dueDate,
+    completionDate: r.completionDate,
     isArchived: r.isArchived,
+    openTaskCount: r.openTaskCount,
     requesterName: `${r.requesterFirstName} ${r.requesterLastName}`,
     unitName: r.unitName,
     ownerName: `${r.ownerFirstName} ${r.ownerLastName}`,
   }))
 }
 
-export function parseProjectFilters(searchParams: Record<string, string | undefined>): ProjectFilters {
+export type ProjectListCounts = {
+  all: number
+  active: number
+  overdue: number
+  mine: number
+  archived: number
+}
+
+export async function getProjectListCounts(baseFilters: ProjectFilters, userId: string): Promise<ProjectListCounts> {
+  async function count(filters: ProjectFilters) {
+    const conditions = buildProjectConditions(filters)
+    const [row] = await db()
+      .select({ count: sql<number>`count(*)::int` })
+      .from(projects)
+      .where(conditions.length > 0 ? and(...conditions) : undefined)
+    return row?.count ?? 0
+  }
+
+  const { status: _status, overdueOnly: _overdueOnly, mineUserId: _mineUserId, archivedOnly: _archivedOnly, ...rest } = baseFilters
+  void _status
+  void _overdueOnly
+  void _mineUserId
+  void _archivedOnly
+
+  const [all, active, overdue, mine, archived] = await Promise.all([
+    count(rest),
+    count({ ...rest, status: 'Active' }),
+    count({ ...rest, overdueOnly: true }),
+    count({ ...rest, mineUserId: userId }),
+    count({ ...rest, archivedOnly: true }),
+  ])
+
+  return { all, active, overdue, mine, archived }
+}
+
+export const PROJECT_TABS = ['all', 'active', 'overdue', 'mine', 'archived'] as const
+export type ProjectTab = (typeof PROJECT_TABS)[number]
+
+export function parseProjectTab(value: string | undefined): ProjectTab {
+  return (PROJECT_TABS as readonly string[]).includes(value ?? '') ? (value as ProjectTab) : 'all'
+}
+
+export function parseProjectFilters(searchParams: Record<string, string | undefined>, currentUserId: string): ProjectFilters {
+  const tab = parseProjectTab(searchParams.tab)
   return {
-    status: searchParams.status || undefined,
+    status: tab === 'active' ? 'Active' : searchParams.status || undefined,
     priority: searchParams.priority || undefined,
     ownerId: searchParams.owner || undefined,
     unitId: searchParams.unit || undefined,
     tagId: searchParams.tag || undefined,
-    overdueOnly: searchParams.overdue === '1',
+    overdueOnly: tab === 'overdue' || searchParams.overdue === '1',
     includeArchived: searchParams.archived === '1',
+    archivedOnly: tab === 'archived',
+    mineUserId: tab === 'mine' ? currentUserId : undefined,
     sort: searchParams.sort || undefined,
   }
 }

@@ -15,7 +15,7 @@ export function DeactivateButton({ userId, isActive }: { userId: string; isActiv
         type="button"
         disabled={pending}
         onClick={() => startTransition(() => reactivateUserAction(userId))}
-        className="text-emerald-600 hover:text-emerald-800 disabled:opacity-60"
+        className="block w-full px-3 py-1.5 text-left text-sm text-pt-good hover:bg-pt-shell disabled:opacity-60"
       >
         Riattiva
       </button>
@@ -32,7 +32,7 @@ export function DeactivateButton({ userId, isActive }: { userId: string; isActiv
           if (result.error) router.push(`/admin/users/${userId}/deactivate`)
         })
       }
-      className="text-rose-600 hover:text-rose-800 disabled:opacity-60"
+      className="block w-full px-3 py-1.5 text-left text-sm text-pt-danger hover:bg-pt-shell disabled:opacity-60"
     >
       Disattiva
     </button>
